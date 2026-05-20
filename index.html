@@ -2011,39 +2011,109 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<style>
+  .nav-arrow {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 15%;
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .nav-arrow.hidden { opacity: 0; pointer-events: none; }
+  .nav-arrow.left  { left: 0; }
+  .nav-arrow.right { right: 0; }
+  .nav-arrow-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(20,17,13,0.55);
+    border: 2px solid rgba(245,240,232,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: rgba(245,240,232,0.9);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  }
+  .nav-arrow:active .nav-arrow-icon {
+    background: rgba(232,98,42,0.7);
+    transform: scale(0.92);
+  }
+  @media (max-width: 600px) {
+    .nav-arrow-icon { width: 52px; height: 52px; font-size: 22px; }
+  }
+</style>
+
+<div class="nav-arrow left"  id="nav-prev" role="button" aria-label="Previous slide">
+  <div class="nav-arrow-icon">&#8592;</div>
+</div>
+<div class="nav-arrow right" id="nav-next" role="button" aria-label="Next slide">
+  <div class="nav-arrow-icon">&#8594;</div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const stage = document.querySelector('deck-stage');
+  const prev  = document.getElementById('nav-prev');
+  const next  = document.getElementById('nav-next');
   if (!stage) return;
 
-  // 1. Hide rail — presentation-only mode
+  // Hide rail — full canvas mode
   stage.setAttribute('no-rail', '');
 
-  // 2. Auto fullscreen on first interaction (browsers require a user gesture)
-  function enterFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  }
-  // Try immediately on load, fallback to first click
+  // Auto fullscreen on first gesture
   document.documentElement.requestFullscreen().catch(() => {
-    document.addEventListener('click', enterFullscreen, { once: true });
+    document.addEventListener('pointerdown', () => {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }, { once: true });
   });
 
-  // 3. Click anywhere → next slide (ignore built-in nav buttons)
+  // Arrow nav
+  prev.addEventListener('click',      () => stage.prev());
+  next.addEventListener('click',      () => stage.next());
+  prev.addEventListener('touchstart', () => stage.prev(), { passive: true });
+  next.addEventListener('touchstart', () => stage.next(), { passive: true });
+
+  // Click on slide (not on arrows) → next
   stage.addEventListener('click', e => {
-    if (e.target.closest('button, a, input, select, [role="button"], #tweaks-root')) return;
+    if (e.target.closest('#nav-prev, #nav-next, button, a, input, select, #tweaks-root')) return;
     stage.next();
   });
 
-  // 4. Arrow keys: right/down = next, left/up = prev
+  // Keyboard: right/down = next, left/up = prev
   document.addEventListener('keydown', e => {
     if (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); stage.next(); }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); stage.prev(); }
-    // ArrowLeft / ArrowRight are already handled by deck-stage natively
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  { e.preventDefault(); stage.next(); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    { e.preventDefault(); stage.prev(); }
   });
+
+  // Auto-hide arrows after 5 s of no activity, show on any interaction
+  let hideTimer;
+  function showArrows() {
+    prev.classList.remove('hidden');
+    next.classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      prev.classList.add('hidden');
+      next.classList.add('hidden');
+    }, 5000);
+  }
+  ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach(ev => {
+    document.addEventListener(ev, showArrows, { passive: true });
+  });
+  showArrows(); // start the 5 s countdown immediately
 });
 </script>
 
