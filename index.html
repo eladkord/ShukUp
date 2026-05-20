@@ -2048,9 +2048,15 @@ document.addEventListener('DOMContentLoaded', () => {
     transform: scale(0.92);
   }
   @media (max-width: 600px) {
-    .nav-arrow-icon { width: 120px; height: 120px; font-size: 52px; }
-    .nav-arrow.left  { left: 16px; }
-    .nav-arrow.right { right: 16px; }
+    .nav-arrow-icon { width: 100px; height: 100px; font-size: 44px; }
+    .nav-arrow.left  { left: 12px; bottom: 32px; }
+    .nav-arrow.right { right: 12px; bottom: 32px; }
+  }
+  /* landscape phones */
+  @media (max-height: 500px) {
+    .nav-arrow-icon { width: 72px; height: 72px; font-size: 30px; }
+    .nav-arrow.left  { left: 16px; bottom: 16px; }
+    .nav-arrow.right { right: 16px; bottom: 16px; }
   }
 </style>
 
@@ -2074,21 +2080,24 @@ document.addEventListener('DOMContentLoaded', () => {
   hideStyle.textContent = '.overlay { display: none !important; }';
   stage.shadowRoot.appendChild(hideStyle);
 
-  // Auto fullscreen on first gesture
-  document.documentElement.requestFullscreen().catch(() => {
-    document.addEventListener('pointerdown', () => {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }, { once: true });
-  });
+  // Auto fullscreen — iOS Safari doesn't support it, so guard carefully
+  const fsEl = document.documentElement;
+  if (fsEl.requestFullscreen) {
+    fsEl.requestFullscreen().catch(() => {
+      document.addEventListener('pointerdown', () => {
+        fsEl.requestFullscreen().catch(() => {});
+      }, { once: true });
+    });
+  }
 
-  // Arrow nav
-  prev.addEventListener('click',      () => stage.prev());
-  next.addEventListener('click',      () => stage.next());
-  prev.addEventListener('touchstart', () => stage.prev(), { passive: true });
-  next.addEventListener('touchstart', () => stage.next(), { passive: true });
+  // Arrow nav — use pointerup so it works on both iOS touch and mouse
+  function goNext(e) { e.stopPropagation(); stage.next(); }
+  function goPrev(e) { e.stopPropagation(); stage.prev(); }
+  next.addEventListener('pointerup', goNext);
+  prev.addEventListener('pointerup', goPrev);
 
   // Click on slide (not on arrows) → next
-  stage.addEventListener('click', e => {
+  stage.addEventListener('pointerup', e => {
     if (e.target.closest('#nav-prev, #nav-next, button, a, input, select, #tweaks-root')) return;
     stage.next();
   });
