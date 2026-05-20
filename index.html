@@ -2014,10 +2014,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
   .nav-arrow {
     position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 15%;
-    min-width: 64px;
+    bottom: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2029,18 +2026,18 @@ document.addEventListener('DOMContentLoaded', () => {
     user-select: none;
   }
   .nav-arrow.hidden { opacity: 0; pointer-events: none; }
-  .nav-arrow.left  { left: 0; }
-  .nav-arrow.right { right: 0; }
+  .nav-arrow.left  { left: 48px; }
+  .nav-arrow.right { right: 48px; }
   .nav-arrow-icon {
-    width: 64px;
-    height: 64px;
+    width: 192px;
+    height: 192px;
     background: rgba(20,17,13,0.55);
-    border: 2px solid rgba(245,240,232,0.25);
+    border: 3px solid rgba(245,240,232,0.25);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 84px;
     color: rgba(245,240,232,0.9);
     backdrop-filter: blur(8px);
     transition: background 0.2s, transform 0.15s;
@@ -2051,7 +2048,9 @@ document.addEventListener('DOMContentLoaded', () => {
     transform: scale(0.92);
   }
   @media (max-width: 600px) {
-    .nav-arrow-icon { width: 52px; height: 52px; font-size: 22px; }
+    .nav-arrow-icon { width: 120px; height: 120px; font-size: 52px; }
+    .nav-arrow.left  { left: 16px; }
+    .nav-arrow.right { right: 16px; }
   }
 </style>
 
@@ -2069,8 +2068,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const next  = document.getElementById('nav-next');
   if (!stage) return;
 
-  // Hide rail — full canvas mode
+  // Hide rail and bottom overlay
   stage.setAttribute('no-rail', '');
+  const hideStyle = document.createElement('style');
+  hideStyle.textContent = '.overlay { display: none !important; }';
+  stage.shadowRoot.appendChild(hideStyle);
 
   // Auto fullscreen on first gesture
   document.documentElement.requestFullscreen().catch(() => {
