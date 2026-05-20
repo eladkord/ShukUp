@@ -2,6 +2,10 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SHUK UP" />
 <title>SHUK UP — מצגת חסויות</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1958,7 +1962,7 @@
     <div class="strip">
       <span>בואו נחזיר לעם את החיוך לפנים.</span>
       <img src="assets/tomix-mark-white.png" alt="toMix" style="height: 36px; justify-self: center;" />
-      <span class="small" style="font-family:'Archivo', sans-serif; font-weight:400; letter-spacing:0.02em;">Creative &amp; Design by <strong style="font-family:'Archivo Black', sans-serif; font-weight:900;">ELAD KORD</strong></span>
+      <span class="small" style="font-family:'Archivo', sans-serif; font-weight:400; letter-spacing:0.02em;">Creative &amp; Design by <a href="https://www.instagram.com/elad.kord/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><strong style="font-family:'Archivo Black', sans-serif; font-weight:900;">ELAD KORD</strong></a></span>
     </div>
   </section>
 
@@ -2059,6 +2063,46 @@ document.addEventListener('DOMContentLoaded', () => {
     .nav-arrow.right { right: 16px; bottom: 16px; }
   }
 </style>
+
+<!-- iOS Add to Home Screen prompt -->
+<div id="ios-prompt" style="
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  background: rgba(20,17,13,0.92);
+  color: rgba(245,240,232,0.95);
+  font-family: 'Assistant', sans-serif;
+  font-size: 15px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(245,240,232,0.2);
+  backdrop-filter: blur(12px);
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+">
+  לחוויה מלאה: לחץ <strong style="color:var(--orange)">שתף ⬆</strong> ← <strong style="color:var(--orange)">הוסף למסך הבית</strong>
+  <span onclick="document.getElementById('ios-prompt').style.display='none'"
+        style="margin-right:12px;opacity:0.5;cursor:pointer;font-size:18px;">✕</span>
+</div>
+
+<script>
+// Show prompt only on iOS Safari, not when already in standalone mode
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone === true;
+if (isIOS && !isStandalone) {
+  setTimeout(() => {
+    document.getElementById('ios-prompt').style.display = 'block';
+    setTimeout(() => {
+      const p = document.getElementById('ios-prompt');
+      if (p) p.style.display = 'none';
+    }, 8000);
+  }, 1500);
+}
+</script>
 
 <div class="nav-arrow left"  id="nav-prev" role="button" aria-label="Previous slide">
   <div class="nav-arrow-icon">&#8592;</div>
